@@ -20,7 +20,7 @@
 </head>
 <body>
     <h1>Quiz</h1>
-    <form>
+    <form id="quiz-form">
         <!-- Question about the user's name -->
         <h2>Question 1: What is your name?</h2>
         <input type="text" name="username">
@@ -52,51 +52,26 @@
         </div>
     </form>
 
+    <!-- Display the user's score -->
+    <div id="user-score">
+
+    </div>
+
     <!-- Footer with information about the author -->
     <footer>
         <h3>Irmak Ege</h3>
     </footer>
 
-
     <script>
-        async function loadExam() {
-            const response = await fetch('/api/exams/1');
-            const exam = await response.json();
-            const examDiv = document.getElementById('exam');
-            exam.questions.forEach(question => {
-                const questionDiv = document.createElement('div');
-                questionDiv.innerHTML = `<h2>${question.text}</h2>`;
-                question.options.forEach(option => {
-                    const optionInput = document.createElement('input');
-                    optionInput.type = 'checkbox';
-                    optionInput.value = option.id;
-                    optionInput.name = `question_${question.id}`;
-                    questionDiv.appendChild(optionInput);
-                    questionDiv.innerHTML += option.text + '<br>';
-                });
-                examDiv.appendChild(questionDiv);
-            });
-        }
-
         async function submitExam() {
-            const data = {};
-            document.querySelectorAll('input[type=checkbox]:checked').forEach(input => {
-                const questionId = input.name.split('_')[1];
-                if (!data[questionId]) data[questionId] = [];
-                data[questionId].push(parseInt(input.value));
-            });
-            const response = await fetch('/api/exams/1/submit', {
+            const formData = new FormData(document.getElementById('quiz-form'));
+            const response = await fetch('/submit', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
+                body: formData
             });
             const result = await response.json();
-            alert(`Your score: ${result.score}`);
+            document.getElementById('user-score').innerHTML = `<h2>Your Score: ${result.score}%</h2>`;
         }
-
-        loadExam();
     </script>
 </body>
 </html>
