@@ -4,8 +4,9 @@ app = Flask(__name__)
 
 # Define the correct answers
 correct_answers = {
-    'question1': 'blue',  # Question 2: Favorite color
-    'question2': 'dog',   # Question 3: Favorite animal
+    'question1': 'c',  
+    'question2': 'b', 
+    'question3': 'b',  
 }
 
 @app.route('/')

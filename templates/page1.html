@@ -16,35 +16,103 @@
             right: 0;
             text-align: center;
         }
+
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        .close, .retry {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .retry {
+            color: #000;
+            background-color: #ddd;
+            padding: 10px 20px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .retry:hover {
+            background-color: #ccc;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
     </style>
 </head>
 <body>
     <h1>Quiz</h1>
-    <form id="quiz-form">
+    <h2>Subject: Apply AI models in Python applications</h2>
+    <form id="quiz-form" oninput="validateForm()">
         <!-- Question about the user's name -->
         <h2>Question 1: What is your name?</h2>
-        <input type="text" name="username">
+        <input type="text" name="username" required>
 
         <!-- First question with multiple choice -->
-        <h2>Question 2: What is your favorite color?</h2>
-        <input type="radio" name="question1" value="red"> Red<br>
-        <input type="radio" name="question1" value="blue"> Blue<br>
-        <input type="radio" name="question1" value="green"> Green<br>
+        <h2>Question 2: Which library is most commonly used for training an AI model in Python?</h2>
+        <input type="radio" name="question1" value="a" required> Numpy<br>
+        <input type="radio" name="question1" value="b" required> Pandas<br>
+        <input type="radio" name="question1" value="c" required> Scikit-learn<br>
+        <input type="radio" name="question1" value="d" required> Flask<br>
 
         <!-- Second question with multiple choice -->
-        <h2>Question 3: What is your favorite animal?</h2>
-        <input type="radio" name="question2" value="dog"> Dog<br>
-        <input type="radio" name="question2" value="cat"> Cat<br>
-        <input type="radio" name="question2" value="parrot"> Parrot<br>
-
-        <!-- Third question with a text input -->
-        <h2>Question 4: Describe your hobbies or interests:</h2>
-        <textarea name="question3" rows="4" cols="50"></textarea>
+        <h2>Question 3: What is one of the main differences between TensorFlow and PyTorch?</h2>
+        <input type="radio" name="question2" value="a" required> TensorFlow only supports CPUs, while PyTorch only supports GPUs.<br>
+        <input type="radio" name="question2" value="b" required> PyTorch uses a dynamic computation graph, while TensorFlow uses a static computation graph.<br>
+        <input type="radio" name="question2" value="c" required> TensorFlow is less popular than PyTorch.<br>
+        <input type="radio" name="question2" value="d" required> TensorFlow only works on computers, while PyTorch works on mobile devices.<br>
+        
+        <!-- Third question with multiple choice -->
+        <h2>Question 4: Which of the following algorithms is NOT typically used for classification problems?</h2>
+        <input type="radio" name="question3" value="a" required> Support Vector Machines (SVM)<br>
+        <input type="radio" name="question3" value="b" required> Linear Regression<br>
+        <input type="radio" name="question3" value="c" required> Decision Trees<br>
+        <input type="radio" name="question3" value="d" required> K-Nearest Neighbors (KNN)<br>
 
         <br>
+        <div id="error-message" class="error"></div>
 
-        <div id="exam"></div>
-        <button onclick="submitExam()">Submit Answers</button>
+        <button type="button" id="submit-button" onclick="submitExam()">Submit Answers</button>
 
         <!-- User's best score in the top right corner -->
         <div style="position: absolute; top: 10px; right: 10px;">
@@ -53,8 +121,13 @@
     </form>
 
     <!-- Display the user's score -->
-    <div id="user-score">
-
+    <!-- The Modal -->
+    <div id="scoreModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="user-score"></h2>
+            <button class="retry" onclick="retryExam()">Try Again</button>
+        </div>
     </div>
 
     <!-- Footer with information about the author -->
@@ -70,8 +143,58 @@
                 body: formData
             });
             const result = await response.json();
-            document.getElementById('user-score').innerHTML = `<h2>Your Score: ${result.score}%</h2>`;
+            document.getElementById('user-score').innerHTML = `Your Score: ${result.score.toFixed(2)}%`;
+            openModal();
         }
+
+        function validateForm() {
+            const form = document.getElementById('quiz-form');
+            const errorMessage = document.getElementById('error-message');
+            const submitButton = document.getElementById('submit-button');
+
+            let isValid = true;
+            const requiredFields = form.querySelectorAll('[required]');
+
+            // Check each required field
+            requiredFields.forEach((field) => {
+                if (!field.value.trim() || (field.type === 'radio' && !form.querySelector(`input[name="${field.name}"]:checked`))) {
+                    isValid = false;
+                }
+            });
+
+            if (!isValid) {
+                errorMessage.textContent = 'Please fill out all required fields.';
+                submitButton.disabled = true;
+            } else {
+                errorMessage.textContent = '';
+                submitButton.disabled = false;
+            }
+        }
+
+        function openModal() {
+            document.getElementById("scoreModal").style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("scoreModal").style.display = "none";
+        }
+
+        function retryExam() {
+            document.getElementById("quiz-form").reset();
+            closeModal();
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById("scoreModal");
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        window.onload = function() {
+            validateForm();  // Initial validation to disable the button if form is incomplete
+        };
     </script>
 </body>
 </html>
