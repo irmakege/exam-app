@@ -48,7 +48,7 @@
             text-align: center;
         }
 
-        .close, .retry {
+        .retry {
             color: #aaa;
             float: right;
             font-size: 28px;
@@ -71,13 +71,6 @@
             background-color: #ccc;
         }
 
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        
     </style>
 </head>
 <body>
@@ -101,7 +94,7 @@
         <input type="radio" name="question2" value="b" required> PyTorch uses a dynamic computation graph, while TensorFlow uses a static computation graph.<br>
         <input type="radio" name="question2" value="c" required> TensorFlow is less popular than PyTorch.<br>
         <input type="radio" name="question2" value="d" required> TensorFlow only works on computers, while PyTorch works on mobile devices.<br>
-        
+
         <!-- Third question with multiple choice -->
         <h2>Question 4: Which of the following algorithms is NOT typically used for classification problems?</h2>
         <input type="radio" name="question3" value="a" required> Support Vector Machines (SVM)<br>
@@ -116,7 +109,7 @@
 
         <!-- User's best score in the top right corner -->
         <div style="position: absolute; top: 10px; right: 10px;">
-            <p>Best Score: 100%</p>
+            <p>Best Score: {{ best_score }}%</p>
         </div>
     </form>
 
@@ -124,7 +117,6 @@
     <!-- The Modal -->
     <div id="scoreModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
             <h2 id="user-score"></h2>
             <button class="retry" onclick="retryExam()">Try Again</button>
         </div>
@@ -182,14 +174,6 @@
         function retryExam() {
             document.getElementById("quiz-form").reset();
             closeModal();
-        }
-
-        // Close modal when clicking outside of it
-        window.onclick = function(event) {
-            const modal = document.getElementById("scoreModal");
-            if (event.target == modal) {
-                closeModal();
-            }
         }
 
         window.onload = function() {
