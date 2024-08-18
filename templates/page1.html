@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Page</title>
+    <style>
+        body {
+            position: relative;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Quiz</h1>
+    <form>
+        <!-- Question about the user's name -->
+        <h2>Question 1: What is your name?</h2>
+        <input type="text" name="username">
+
+        <!-- First question with multiple choice -->
+        <h2>Question 2: What is your favorite color?</h2>
+        <input type="radio" name="question1" value="red"> Red<br>
+        <input type="radio" name="question1" value="blue"> Blue<br>
+        <input type="radio" name="question1" value="green"> Green<br>
+
+        <!-- Second question with multiple choice -->
+        <h2>Question 3: What is your favorite animal?</h2>
+        <input type="radio" name="question2" value="dog"> Dog<br>
+        <input type="radio" name="question2" value="cat"> Cat<br>
+        <input type="radio" name="question2" value="parrot"> Parrot<br>
+
+        <!-- Third question with a text input -->
+        <h2>Question 4: Describe your hobbies or interests:</h2>
+        <textarea name="question3" rows="4" cols="50"></textarea>
+
+        <br>
+
+        <div id="exam"></div>
+        <button onclick="submitExam()">Submit Answers</button>
+
+        <!-- User's best score in the top right corner -->
+        <div style="position: absolute; top: 10px; right: 10px;">
+            <p>Best Score: 100%</p>
+        </div>
+    </form>
+
+    <!-- Footer with information about the author -->
+    <footer>
+        <h3>Irmak Ege</h3>
+    </footer>
+
+
+    <script>
+        async function loadExam() {
+            const response = await fetch('/api/exams/1');
+            const exam = await response.json();
+            const examDiv = document.getElementById('exam');
+            exam.questions.forEach(question => {
+                const questionDiv = document.createElement('div');
+                questionDiv.innerHTML = `<h2>${question.text}</h2>`;
+                question.options.forEach(option => {
+                    const optionInput = document.createElement('input');
+                    optionInput.type = 'checkbox';
+                    optionInput.value = option.id;
+                    optionInput.name = `question_${question.id}`;
+                    questionDiv.appendChild(optionInput);
+                    questionDiv.innerHTML += option.text + '<br>';
+                });
+                examDiv.appendChild(questionDiv);
+            });
+        }
+
+        async function submitExam() {
+            const data = {};
+            document.querySelectorAll('input[type=checkbox]:checked').forEach(input => {
+                const questionId = input.name.split('_')[1];
+                if (!data[questionId]) data[questionId] = [];
+                data[questionId].push(parseInt(input.value));
+            });
+            const response = await fetch('/api/exams/1/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            alert(`Your score: ${result.score}`);
+        }
+
+        loadExam();
+    </script>
+</body>
+</html>
